@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather App — Live Forecast</title>
+    <meta name="description" content="Get real-time weather forecasts with beautiful animated backgrounds.">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body data-weather="{{ current.description|lower if current else 'default' }}">
+
+<!-- Animated background canvas -->
+<canvas id="weather-canvas"></canvas>
+
+<div class="app-container">
+    <!-- Header -->
+    <header class="app-header">
+        <h1><i class="fa-solid fa-cloud-sun"></i> Weather App</h1>
+        <p class="subtitle">Real-time weather  &middot;  7-day history  &middot;  3-day forecast</p>
+    </header>
+
+    {# Nav — Analysis link disabled for now
+    <div style="text-align:center; margin-bottom: 28px;">
+        <a href="{{ url_for('analysis') }}" class="nav-link-glass">
+            <i class="fa-solid fa-chart-line"></i> Analysis Dashboard
+        </a>
+    </div>
+    #}
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+        {% for message in messages %}
+            <div class="flash-alert"><i class="fa-solid fa-triangle-exclamation"></i> {{ message }}</div>
+        {% endfor %}
+    {% endif %}
+    {% endwith %}
+
+    <!-- Search -->
+    <form method="POST" class="search-bar" id="search-form">
+        <input type="text" name="city" placeholder="Search any city…" required autocomplete="off">
+        <button type="submit"><i class="fa-solid fa-magnifying-glass"></i> Search</button>
+    </form>
+
+    <!-- Current Weather -->
+    {% if current %}
+    <div class="glass weather-hero" id="current-weather">
+        <div class="hero-main">
+            <div class="city-name">{{ city.title() }}</div>
+            <div class="timezone-info">
+                <i class="fa-regular fa-clock"></i> {{ current.local_time }}
+                &nbsp;&middot;&nbsp;
+                {{ current.timezone }}
+                &nbsp;&middot;&nbsp;
+                <i class="fa-solid fa-location-dot"></i> {{ current.latitude }}°N, {{ current.longitude }}°E
+            </div>
+            <img src="{{ current.icon }}" alt="{{ current.description }}" class="weather-icon">
+            <div class="temp-big">{{ current.temp }}°C</div>
+            <div class="condition-text">{{ current.description }}</div>
+        </div>
+        <div class="hero-stats">
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fa-solid fa-droplet" style="color:#60a5fa"></i></div>
+                <div class="stat-value">{{ current.humidity }}%</div>
+                <div class="stat-label">Humidity</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fa-solid fa-wind" style="color:#34d399"></i></div>
+                <div class="stat-value">{{ current.wind }} km/h</div>
+                <div class="stat-label">Wind</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fa-solid fa-gauge-high" style="color:#f472b6"></i></div>
+                <div class="stat-value">{{ current.pressure }}</div>
+                <div class="stat-label">Pressure hPa</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fa-solid fa-temperature-half" style="color:#fbbf24"></i></div>
+                <div class="stat-value">{{ current.temp }}°C</div>
+                <div class="stat-label">Temperature</div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Past 7 Days -->
+    {% if past_forecast %}
+    <div class="section-title"><span class="icon"><i class="fa-solid fa-clock-rotate-left"></i></span> Past 7 Days</div>
+    <div class="forecast-grid" id="past-grid">
+        {% for day in past_forecast %}
+        <div class="glass forecast-card">
+            <div class="forecast-date">{{ day.date }}</div>
+            <img src="{{ day.icon }}" alt="{{ day.description }}" class="forecast-icon">
+            <div class="forecast-temp">{{ day.avg_temp }}°C</div>
+            <div class="forecast-desc">{{ day.description }}</div>
+            <div class="forecast-humidity"><i class="fa-solid fa-droplet"></i> {{ day.humidity }}%</div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Future 3 Days -->
+    {% if future_forecast %}
+    <div class="section-title"><span class="icon"><i class="fa-solid fa-calendar-days"></i></span> Next 3 Days Forecast</div>
+    <div class="forecast-grid" id="future-grid">
+        {% for day in future_forecast %}
+        <div class="glass forecast-card">
+            <div class="forecast-date">{{ day.date }}</div>
+            <img src="{{ day.icon }}" alt="{{ day.description }}" class="forecast-icon">
+            <div class="forecast-temp">{{ day.avg_temp }}°C</div>
+            <div class="forecast-desc">{{ day.description }}</div>
+            <div class="forecast-humidity"><i class="fa-solid fa-droplet"></i> {{ day.humidity }}%</div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>
+
+<script src="{{ url_for('static', filename='js/weather-bg.js') }}"></script>
+</body>
+</html>

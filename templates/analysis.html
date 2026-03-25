@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather Analysis Dashboard</title>
+    <meta name="description" content="Analyze historical weather data with interactive charts.">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body data-weather="default">
+
+<!-- Animated background canvas -->
+<canvas id="weather-canvas"></canvas>
+
+<div class="app-container">
+    <!-- Header -->
+    <header class="app-header">
+        <h1><i class="fa-solid fa-chart-column"></i> Weather Analysis</h1>
+        <p class="subtitle">Explore historical temperature &amp; humidity trends</p>
+    </header>
+
+    <!-- Nav -->
+    <div style="text-align:center; margin-bottom: 28px;">
+        <a href="{{ url_for('home') }}" class="nav-link-glass">
+            <i class="fa-solid fa-house"></i> Back to Home
+        </a>
+    </div>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+        {% for message in messages %}
+            <div class="flash-alert"><i class="fa-solid fa-triangle-exclamation"></i> {{ message }}</div>
+        {% endfor %}
+    {% endif %}
+    {% endwith %}
+
+    <!-- Analysis Form -->
+    <div class="glass analysis-form" id="analysis-form">
+        <form method="POST" class="form-grid">
+            <div class="form-group">
+                <label for="city-select"><i class="fa-solid fa-city"></i> City</label>
+                <select name="city" id="city-select">
+                    {% for city in cities %}
+                    <option value="{{ city }}">{{ city }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="start-date"><i class="fa-regular fa-calendar"></i> Start Date</label>
+                <input type="date" name="start_date" id="start-date">
+            </div>
+            <div class="form-group">
+                <label for="end-date"><i class="fa-regular fa-calendar-check"></i> End Date</label>
+                <input type="date" name="end_date" id="end-date">
+            </div>
+            <div class="form-group">
+                <label>&nbsp;</label>
+                <button type="submit" class="btn-analyze"><i class="fa-solid fa-magnifying-glass-chart"></i> Analyze</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Chart -->
+    {% if plot_url %}
+    <div class="glass chart-container" id="chart-output">
+        <img src="data:image/png;base64,{{ plot_url }}" alt="Weather Analysis Graph">
+    </div>
+    {% endif %}
+</div>
+
+<script src="{{ url_for('static', filename='js/weather-bg.js') }}"></script>
+</body>
+</html>
